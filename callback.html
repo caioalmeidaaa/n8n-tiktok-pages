@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Retorno TikTok OAuth</title>
+</head>
+<body>
+  <h1>Autenticando com TikTok...</h1>
+  <pre id="resultado">Processando...</pre>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const state = params.get("state");
+
+    const output = `Code: ${code}\nState: ${state}`;
+    document.getElementById("resultado").innerText = output;
+
+    // Enviar para seu webhook do n8n
+    fetch("https://almeidacaio.app.n8n.cloud/webhook-test/tiktok-oauth-callback", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        code: code,
+        state: state
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        document.getElementById("resultado").innerText += "\n✅ Código enviado com sucesso para o n8n!";
+      } else {
+        document.getElementById("resultado").innerText += "\n❌ Erro ao enviar código para o n8n.";
+      }
+    })
+    .catch(err => {
+      document.getElementById("resultado").innerText += "\n❌ Falha na conexão com o servidor.";
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
